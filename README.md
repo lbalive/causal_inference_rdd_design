@@ -1,4 +1,6 @@
-# MLDA Regression Discontinuity Design
+**IMPORTANT**: This project uses the `renv` package to ensure full reproducibility. To reproduce the analysis, run `renv::restore()` in the Console after cloning the repository.
+
+# Causal Inference: Regression Discontinuity Design
 
 This repository presents a fully reproducible regression discontinuity design (RDD) analysis estimating the causal effect of reaching the Minimum Legal Drinking Age (MLDA = 21) on mortality outcomes in the United States.
 

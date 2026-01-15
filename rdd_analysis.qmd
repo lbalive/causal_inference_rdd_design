@@ -1,6 +1,6 @@
 ---
 title: "Regression Discontinuity Design: Minimum Legal Drinking Age"
-author: "Your Name"
+author: "Luca Bella"
 date: "`r Sys.Date()`"
 format:
   html:
@@ -21,7 +21,13 @@ MAIN ASSUMPTION: Identification of the causal effect relies on the assumption th
 
 # Setup
 
-We use age-in-month mortality data from Carpenter and Dobkin (2011), distributed with *Mostly Harmless Econometrics*.
+## Reproducibility
+
+**IMPORTANT**: This project uses the `renv` package to ensure full reproducibility. To reproduce the analysis, run `renv::restore()` in the Console after cloning the repository.
+
+## Packages
+
+This section will install - if needed - necessary packages and load them, as well as downloading data and store it in a new directory.
 
 ```{r}
 packages <- c("tidyverse", "haven", "rdrobust", "rddensity")
@@ -43,6 +49,8 @@ unzip(zip, exdir = "data/raw")
 ```
 
 # Data
+
+We use age-in-month mortality data from Carpenter and Dobkin (2011), distributed with *Mostly Harmless Econometrics*.
 
 We'll apply two main modifications here. The dataset includes both raw mortality outcomes and smoothed series (denoted by variables ending in "fitted") that were constructed for visualization purposes in Mostly Harmless Econometrics. All analyses in this paper use the raw mortality measures; the smoothed series are excluded from estimation. The running variable is age in years and we center it at the legal drinking age cutoff for interpretability purposes.
 

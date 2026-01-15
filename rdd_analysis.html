@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Your Name">
+<meta name="author" content="Luca Bella">
 <meta name="dcterms.date" content="2026-01-14">
 
 <title>Regression Discontinuity Design: Minimum Legal Drinking Age</title>
@@ -49,9 +49,17 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a>
+  <ul class="collapse">
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility">Reproducibility</a></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages">Packages</a></li>
+  </ul></li>
   <li><a href="#data" id="toc-data" class="nav-link" data-scroll-target="#data">Data</a></li>
-  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#regression-discontinuity-design" id="toc-regression-discontinuity-design" class="nav-link" data-scroll-target="#regression-discontinuity-design">Regression Discontinuity Design</a></li>
+  <li><a href="#estimation-and-inference" id="toc-estimation-and-inference" class="nav-link" data-scroll-target="#estimation-and-inference">Estimation and Inference</a></li>
+  </ul></li>
   <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   <li><a href="#robustness" id="toc-robustness" class="nav-link" data-scroll-target="#robustness">Robustness</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
@@ -73,7 +81,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Your Name </p>
+             <p>Luca Bella </p>
           </div>
   </div>
     
@@ -99,15 +107,34 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="setup" class="level1">
 <h1>Setup</h1>
-<p>We use age-in-month mortality data from Carpenter and Dobkin (2011), distributed with <em>Mostly Harmless Econometrics</em>.</p>
+<section id="reproducibility" class="level2">
+<h2 class="anchored" data-anchor-id="reproducibility">Reproducibility</h2>
+<p><strong>IMPORTANT</strong>: This project uses the <code>renv</code> package to ensure full reproducibility. To reproduce the analysis, run <code>renv::restore()</code> in the Console after cloning the repository.</p>
+</section>
+<section id="packages" class="level2">
+<h2 class="anchored" data-anchor-id="packages">Packages</h2>
+<p>This section will install - if needed - necessary packages and load them, as well as downloading data and store it in a new directory.</p>
+</section>
 </section>
 <section id="data" class="level1">
 <h1>Data</h1>
+<p>We use age-in-month mortality data from Carpenter and Dobkin (2011), distributed with <em>Mostly Harmless Econometrics</em>.</p>
 <p>We’ll apply two main modifications here. The dataset includes both raw mortality outcomes and smoothed series (denoted by variables ending in “fitted”) that were constructed for visualization purposes in Mostly Harmless Econometrics. All analyses in this paper use the raw mortality measures; the smoothed series are excluded from estimation. The running variable is age in years and we center it at the legal drinking age cutoff for interpretability purposes.</p>
 </section>
 <section id="methods" class="level1">
 <h1>Methods</h1>
-<p>We use a sharp regression discontinuity design because legal access to alcohol changes deterministically at age 21. Individuals below the cutoff are prohibited from purchasing alcohol, while those at or above age 21 are legally permitted to do so. As treatment assignment is a known function of age, a sharp design is appropriate. Estimation uses local linear regression with robust bias-corrected inference to account for finite-sample bias near the cutoff. This approach corrects for smoothing bias and yields valid confidence intervals when using data-driven bandwidths. We follow standard practice and implement this method using rdrobust.</p>
+<section id="regression-discontinuity-design" class="level3">
+<h3 class="anchored" data-anchor-id="regression-discontinuity-design">Regression Discontinuity Design</h3>
+<p>We estimate the causal effect of legal access to alcohol using a sharp regression discontinuity design (RDD), exploiting the deterministic change in legal drinking status at age 21. Age, measured in months and centered at the cutoff, serves as the running variable. Treatment assignment changes discontinuously at the cutoff, creating a quasi-experimental comparison between individuals just below and just above age 21.</p>
+<p>Identification relies on two key assumptions. First, potential outcomes must evolve smoothly in age in the absence of treatment, so that any discontinuity in mortality at the cutoff can be attributed to legal drinking access. Second, individuals must not be able to precisely manipulate the running variable. Age is fixed and not subject to individual control, making this assumption highly credible in the MLDA setting.</p>
+<p>The estimand is the local average treatment effect at the cutoff, defined as the difference in expected outcomes immediately above and below age 21. As with all RDD estimates, this effect is local and should not be extrapolated far from the cutoff.</p>
+</section>
+<section id="estimation-and-inference" class="level3">
+<h3 class="anchored" data-anchor-id="estimation-and-inference">Estimation and Inference</h3>
+<p>We implement local linear regressions on either side of the cutoff, which are standard in RDD applications due to their favorable boundary properties. Estimation focuses on observations within a data-driven bandwidth around the cutoff, balancing bias and variance.</p>
+<p>Inference follows the robust bias-corrected procedure developed by Calonico, Cattaneo, and Titiunik (2014). Local polynomial estimators near the cutoff suffer from boundary bias because observations are only available on one side of the threshold. Robust bias-corrected inference explicitly estimates this bias, adjusts the point estimate accordingly, and inflates standard errors to account for the additional uncertainty introduced by bias estimation. This approach delivers confidence intervals with correct coverage and is now standard practice in applied regression discontinuity analyses.</p>
+<p>All estimates are computed using the <code>rdrobust</code> package, which implements mean squared error–optimal bandwidth selection and robust bias-corrected confidence intervals. Covariates are not required for identification in a sharp RDD and are omitted to preserve transparency and interpretability.</p>
+</section>
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
@@ -239,7 +266,7 @@ $Estplot</code></pre>
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
-<p>Carpenter, C., &amp; Dobkin, C. (2011). The Minimum Legal Drinking Age and Public Health. Journal of Economic Perspectives. Calonico, S., Cattaneo, M. D., &amp; Titiunik, R. (2014). Robust Nonparametric Confidence Intervals for Regression-Discontinuity Designs. Econometrica.</p>
+<p>Angrist, J. D., &amp; Pischke, J.-S. (2009). Mostly Harmless Econometrics. Princeton University Press. Carpenter, C., &amp; Dobkin, C. (2011). The Minimum Legal Drinking Age and Public Health. Journal of Economic Perspectives. Calonico, Calonico, S., Cattaneo, M. D., &amp; Titiunik, R. (2014). Robust nonparametric confidence intervals for regression-discontinuity designs. Econometrica, 82(6), 2295–2326.</p>
 </section>
 
 </main>
