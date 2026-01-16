@@ -3,12 +3,13 @@ title: "Regression Discontinuity Design: Minimum Legal Drinking Age"
 author: "Luca Bella"
 date: "`r Sys.Date()`"
 format:
-  html:
+  pdf:
     toc: true
     toc-depth: 3
     code-fold: true
+output_file: final_report
 execute:
-  echo: false
+  echo: true
   warning: false
   message: false
 ---
@@ -25,19 +26,17 @@ MAIN ASSUMPTION: Identification of the causal effect relies on the assumption th
 
 **IMPORTANT**: This project uses the `renv` package to ensure full reproducibility. To reproduce the analysis, run `renv::restore()` in the Console after cloning the repository.
 
-## Packages
+## Packages and data download
 
-This section will install - if needed - necessary packages and load them, as well as downloading data and store it in a new directory.
+Load packages, download and store data in a new directory.
 
 ```{r}
-packages <- c("tidyverse", "haven", "rdrobust", "rddensity")
-
-for (p in packages) {
-  if (!require(p, character.only = TRUE)) {
-    install.packages(p, dependencies = TRUE)
-    library(p, character.only = TRUE)
-  }
-}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(haven)
+  library(rdrobust)
+  library(rddensity)
+})
 
 dir.create("data/raw", recursive = TRUE, showWarnings = FALSE)
 
@@ -48,7 +47,7 @@ if (!file.exists(zip)) download.file(url, zip, mode = "wb")
 unzip(zip, exdir = "data/raw")
 ```
 
-# Data
+# Data import
 
 We use age-in-month mortality data from Carpenter and Dobkin (2011), distributed with *Mostly Harmless Econometrics*.
 
@@ -112,7 +111,6 @@ dens <- rddensity(mlda$running, c = 0)
 summary(dens)
 
 # Density plot
-#| fig-height: 4 # otherwise unnecessary empty space will appear below the graph
 rdplotdensity(mlda$running, rdd = dens)
 ```
 

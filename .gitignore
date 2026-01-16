@@ -1,4 +1,5 @@
 # R
+.Ruserdata
 .Rhistory
 .RData
 .Rprofile
@@ -14,5 +15,6 @@ data/raw/*.zip
 # macOS
 .DS_Store
 
-# Personal theory notes
-Theoretical_background.md
+# Personal notes
+theoretical_background.md
+notes.txt
